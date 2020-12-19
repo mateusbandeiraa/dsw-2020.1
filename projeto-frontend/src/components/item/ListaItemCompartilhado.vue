@@ -114,7 +114,10 @@ export default {
     },
 
     detalhe: function (item) {
-      // TODO
+      this.$router.push({
+          name: 'item-details',
+          params: { item: item }
+      });
     },
 
     remove: function(item) {

@@ -24,6 +24,7 @@ import ListaItemCompartilhado from './components/item/ListaItemCompartilhado.vue
 import NovoItemCompartilhado from './components/item/NovoItemCompartilhado.vue'
 import AtualizaItemCompartilhado from './components/item/AtualizaItemCompartilhado.vue'
 import RemoveItemCompartilhado from './components/item/RemoveItemCompartilhado.vue'
+import DetalhesItemCompartilhado from './components/item/DetalhesItemCompartilhado.vue'
 
 Vue.use(Router)
 
@@ -102,6 +103,12 @@ const router = new Router({
     component: RemoveItemCompartilhado,
     props: true
   },
+  {
+    path: '/item/details',
+    name: 'item-details',
+    component: DetalhesItemCompartilhado,
+    props: true
+  }
 ]
 })
 
