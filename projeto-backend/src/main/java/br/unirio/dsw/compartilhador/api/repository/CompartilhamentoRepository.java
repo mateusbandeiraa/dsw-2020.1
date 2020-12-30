@@ -19,6 +19,8 @@ import br.unirio.dsw.compartilhador.api.model.Compartilhamento;
 public interface CompartilhamentoRepository extends JpaRepository<Compartilhamento, Long>
 {
 	List<Compartilhamento> findByUsuarioId(Long usuarioId);
+	
+	List<Compartilhamento> findByItemId(Long itemId);
 
 	Page<Compartilhamento> findByUsuarioId(Long usuarioId, Pageable pageable);
 
