@@ -54,7 +54,7 @@ public class ItemCompartilhadoController
 	 * Ação que lista os itens compartilhados de um usuário
 	 */
 	@GetMapping(value = "/lista")
-	public ResponseEntity<ResponseData> list(@RequestParam int page, @RequestParam int per_page)
+	public ResponseEntity<ResponseData> list(@RequestParam int page, @RequestParam String filter, @RequestParam int per_page)
 	{
 		log.info("Listando items dono");
 		String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -68,8 +68,8 @@ public class ItemCompartilhadoController
 			return ControllerResponse.fail("Não foi possível recuperar os dados do usuário a partir das credenciais.");
 		
 		Pageable pageable = PageRequest.of(page-1, per_page);
-		Page<ItemCompartilhado> itens = itemRepositorio.findByUsuarioId(usuario.getId(), pageable);
-
+		Page<ItemCompartilhado> itens = itemRepositorio.findByUsuarioIdContainingNomeAndDescricao(usuario.getId(), pageable, filter, filter);
+	
 		PageDTO<ItemCompartilhadoDTO> result = new PageDTO<ItemCompartilhadoDTO>(itens.getTotalElements(), page, per_page);
 		
 		itens.forEach(item -> {
