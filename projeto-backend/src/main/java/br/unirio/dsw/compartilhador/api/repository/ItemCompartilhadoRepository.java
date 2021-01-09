@@ -28,4 +28,10 @@ public interface ItemCompartilhadoRepository extends JpaRepository<ItemCompartil
 
 	@Query("SELECT ic FROM ItemCompartilhado ic WHERE ic.usuario.id = :ownerId AND ic.removido = 0") 
 	Page<ItemCompartilhado> findByUsuarioId(@Param("ownerId") Long ownerId, Pageable pageable);
+	
+	@Query("SELECT ic FROM ItemCompartilhado ic WHERE ic.usuario.id = :ownerId AND ic.removido = 0 AND (ic.nome like %:itemNome% OR ic.descricao like %:itemDescricao%)") 
+	List<ItemCompartilhado> findByUsuarioIdContainingNomeAndDescricao(@Param("ownerId") Long ownerId, @Param("itemNome") String itemNome, @Param("itemDescricao") String itemDescricao);
+
+	@Query("SELECT ic FROM ItemCompartilhado ic WHERE ic.usuario.id = :ownerId AND ic.removido = 0 AND (ic.nome like %:itemNome% OR ic.descricao like %:itemDescricao%)") 
+	Page<ItemCompartilhado> findByUsuarioIdContainingNomeAndDescricao(@Param("ownerId") Long ownerId, Pageable pageable, @Param("itemNome") String itemNome, @Param("itemDescricao") String itemDescricao);
 }

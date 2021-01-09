@@ -12,6 +12,11 @@
         <div class="clear"></div>
       </div>
 
+      <div class="form-inline">
+        <input class="form-control" type="search" placeholder="Pesquisar" aria-label="Search" id="inputFiltro" v-model="filtro" v-on:keyup.enter="processForm">
+        <button class="btn btn-outline-success" @click="processForm()">Pesquisar</button>
+      </div>
+
       <table class="table table-striped" id="tbItens">
       <thead>
         <tr>
@@ -37,13 +42,13 @@
 
       <div>
         <div class="page-item first" :class="{ disable: this.page == 1 }" @click="moveTo(page-1)">&lt;&lt;</div>
-        <div class="page-item" v-show="page > 3" @click="moveTo(page-3)">{{page-3}}</div>
-        <div class="page-item" v-show="page > 2" @click="moveTo(page-2)">{{page-2}}</div>
-        <div class="page-item" v-show="page > 1" @click="moveTo(page-1)">{{page-1}}</div>
+        <div class="page-item" v-if="page > 3" @click="moveTo(page-3)">{{page-3}}</div>
+        <div class="page-item" v-if="page > 2" @click="moveTo(page-2)">{{page-2}}</div>
+        <div class="page-item" v-if="page > 1" @click="moveTo(page-1)">{{page-1}}</div>
         <div class="page-item current disable">{{page}}</div>
-        <div class="page-item" v-show="totalPages > page"   @click="moveTo(page+1)">{{page+1}}</div>
-        <div class="page-item" v-show="totalPages > page+1" @click="moveTo(page+2)">{{page+2}}</div>
-        <div class="page-item" v-show="totalPages > page+2" @click="moveTo(page+3)">{{page+3}}</div>
+        <div class="page-item" v-if="totalPages > page"   @click="moveTo(page+1)">{{page+1}}</div>
+        <div class="page-item" v-if="totalPages > page+1" @click="moveTo(page+2)">{{page+2}}</div>
+        <div class="page-item" v-if="totalPages > page+2" @click="moveTo(page+3)">{{page+3}}</div>
         <div class="page-item last" :class="{ disable: this.page == this.totalPages }" @click="moveTo(page+1)">&gt;&gt;</div>
         <div class="clear"></div>
       </div>
@@ -60,6 +65,7 @@ export default {
       page: 1,
       totalPages: 1,
       items: [],
+      filtro: '',
 
       httpOptions: {
           baseURL: this.$root.config.url,
@@ -78,7 +84,7 @@ export default {
 
   methods: {
     processForm: function() {
-      axios.get("/api/item/lista?sort=&per_page=10&page=" + this.page, this.httpOptions)
+      axios.get(`/api/item/lista?sort=&per_page=10&page=${this.page}&filter=${this.filtro}`,this.httpOptions)
         .then(response => {
           this.items = response.data.data.data;
           this.page = response.data.data.current_page;
@@ -117,7 +123,7 @@ export default {
           name: 'item-delete',
           params: { item: item }
       });
-    }
+    },
   }
 }
 </script>
