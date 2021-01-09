@@ -8,6 +8,29 @@
       <h4>Tipo</h4>
       <p>{{item.tipo}}</p>
     </div>
+          <table class="table table-striped" id="tbItens">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Descrição</th>
+          <th>Tipo</th>
+          <th class="commands"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- <tr v-for="item in items">
+          <td>{{item.nome}}</td>
+          <td>{{item.descricao}}</td>
+          <td>{{item.tipo}}</td>
+          <td class="commands">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true" @click="edita(item)"></span>
+            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" @click="detalhe(item)"></span>
+            <span class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
+          </td>
+        </tr> -->
+      </tbody>
+      </table>
   </div>
 </template>
 
@@ -24,17 +47,28 @@ export default {
       success: false,
 
       httpOptions: {
-        baseURL: this.$root.config.url,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + this.$root.credentials.token,
-        },
+          baseURL: this.$root.config.url,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + this.$root.credentials.token
+          }
       },
     };
   },
 
+  created: function () {
+    this.getCompartilhamentos();
+  },
+
   methods: {
+    getCompartilhamentos: function () {
+      axios
+        .get(`/api/item/compartilhamento?idItem=${this.item.id}`, this.httpOptions)
+        .then(response => {
+          console.table(response.data);
+        })
+    },
     processForm: function () {
       axios
         .post("/api/item/atualiza", this.item, this.httpOptions)
