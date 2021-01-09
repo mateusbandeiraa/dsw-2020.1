@@ -32,8 +32,9 @@
           <td>{{item.nome}}</td>
           <td>{{item.descricao}}</td>
           <td>{{item.tipo}}</td>
-          <td>
+          <td class="commands">
             <span class="glyphicon glyphicon-pencil" aria-hidden="true" @click="edita(item)"></span>
+            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" @click="detalhe(item)"></span>
             <span class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
           </td>
         </tr>
@@ -118,6 +119,13 @@ export default {
       });
     },
 
+    detalhe: function (item) {
+      this.$router.push({
+          name: 'item-details',
+          params: { item: item }
+      });
+    },
+
     remove: function(item) {
       this.$router.push({
           name: 'item-delete',
@@ -132,8 +140,11 @@ export default {
 div.lista-items-compartilhados {
   margin-top: 32px;
 }
-th.commands {
-  width: 48px;
+td.commands {
+  text-align: right;
+}
+td.commands > span {
+  margin: 0 5px;
 }
 div.page-item {
   color: #2973b7;
