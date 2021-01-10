@@ -140,6 +140,7 @@ class CompartilhamentoDTO {
 	private String dataInicio;
 	private String dataTermino;
 	private String nomeUsuario;
+	private String nomeDono;
 	private String status;
 
 	CompartilhamentoDTO() {
@@ -157,5 +158,6 @@ class CompartilhamentoDTO {
 								: compartilhamento.isCanceladoUsuario() ? "CANCELADO_USUARIO" : "ABERTO";
 		this.setStatus(status);
 		this.setNomeUsuario(compartilhamento.getUsuario().getNome());
+		this.setNomeDono(compartilhamento.getItem().getUsuario().getNome());
 	}
 }
