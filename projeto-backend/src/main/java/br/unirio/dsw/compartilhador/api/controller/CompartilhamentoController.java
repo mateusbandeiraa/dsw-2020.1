@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,10 +94,14 @@ public class CompartilhamentoController {
 	@PostMapping("")
 	public ResponseEntity<ResponseData> novo(@RequestBody NovoCompartilhamentoForm form) {
 		log.info("Entrando em novo com parâmetros {}", form);
-		Usuario usuario = usuarioRepositorio.findById(form.getIdUsuario()).orElse(null);
+		Usuario usuario = usuarioRepositorio.findByEmail(form.getEmailUsuario());
 
 		if (usuario == null) {
 			return ControllerResponse.fail("usuario", "Usuário não encontrado.");
+		}
+		
+		if(usuario.getEmail().equals((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal())) {
+			return ControllerResponse.fail("usuario", "Não é possível compartilhar um item consigo mesmo.");
 		}
 
 		ItemCompartilhado item = itemRepositorio.findById(form.getIdItem()).orElse(null);
@@ -118,9 +123,8 @@ public class CompartilhamentoController {
 
 }
 
-@Data
-class NovoCompartilhamentoForm {
-	private long idUsuario;
+@Data class NovoCompartilhamentoForm {
+	private String emailUsuario;
 	private long idItem;
 	private String dataInicio;
 	private String dataTermino;
