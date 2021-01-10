@@ -8,7 +8,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +44,8 @@ public class CompartilhamentoController {
 
 	@Autowired
 	private UsuarioRepository usuarioRepositorio;
+
+	private Usuario usuarioLogado;
 
 	@GetMapping("/")
 	public ResponseEntity<ResponseData> get(@RequestParam(name = "idItem", required = false) Long idItem,
@@ -77,14 +81,36 @@ public class CompartilhamentoController {
 		return ControllerResponse.success(result);
 	}
 
-	@PostMapping("{idCompartilhamento}/cancelar")
-	public ResponseEntity<ResponseData> cancelar(@PathVariable("idCompartilhamento") long idCompartilhamento) {
+	@PostMapping("{idCompartilhamento}/status")
+	public ResponseEntity<ResponseData> mudarStatus(@PathVariable("idCompartilhamento") long idCompartilhamento,
+			@RequestParam("status") String status) {
 		log.info("Entrando em cancelar com idCompartilhamento {}", idCompartilhamento);
 		Compartilhamento findById = compartilhamentoRepository.findById(idCompartilhamento).orElse(null);
 		if (findById == null) {
 			return ResponseEntity.notFound().build();
 		}
-		findById.setCanceladoDono(true);
+		switch (status) {
+		case "CANCELADO_DONO":
+			/* Verifica se o usuario logado é o dono do item */
+			if (!findById.getItem().getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
+			break;
+		case "ACEITO":
+		case "REJEITADO":
+		case "CANCELADO_USUARIO":
+			/* Verifica se o usuario logado é o destinatário do compartilhamento */
+			if (!findById.getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
+			break;
+		default:
+			return ControllerResponse.fail("Status inválido.");
+		}
+		findById.setCanceladoDono(status.equals("CANCELADO_DONO"));
+		findById.setAceito(status.equals("ACEITO"));
+		findById.setRejeitado(status.equals("REJEITADO"));
+		findById.setCanceladoUsuario(status.equals("CANCELADO_USUARIO"));
 		compartilhamentoRepository.save(findById);
 		return ControllerResponse.success(new CompartilhamentoDTO(findById));
 
@@ -93,10 +119,14 @@ public class CompartilhamentoController {
 	@PostMapping("")
 	public ResponseEntity<ResponseData> novo(@RequestBody NovoCompartilhamentoForm form) {
 		log.info("Entrando em novo com parâmetros {}", form);
-		Usuario usuario = usuarioRepositorio.findById(form.getIdUsuario()).orElse(null);
+		Usuario usuario = usuarioRepositorio.findByEmail(form.getEmailUsuario());
 
 		if (usuario == null) {
 			return ControllerResponse.fail("usuario", "Usuário não encontrado.");
+		}
+
+		if (usuario.getEmail().equals(obterUsuarioLogado().getEmail())) {
+			return ControllerResponse.fail("usuario", "Não é possível compartilhar um item consigo mesmo.");
 		}
 
 		ItemCompartilhado item = itemRepositorio.findById(form.getIdItem()).orElse(null);
@@ -116,11 +146,19 @@ public class CompartilhamentoController {
 		return ControllerResponse.success();
 	}
 
+	private Usuario obterUsuarioLogado() {
+		if (usuarioLogado == null) {
+			usuarioLogado = usuarioRepositorio
+					.findByEmail((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		}
+		return usuarioLogado;
+	}
+
 }
 
 @Data
 class NovoCompartilhamentoForm {
-	private long idUsuario;
+	private String emailUsuario;
 	private long idItem;
 	private String dataInicio;
 	private String dataTermino;
