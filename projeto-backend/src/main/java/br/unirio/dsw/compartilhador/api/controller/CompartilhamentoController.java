@@ -44,9 +44,31 @@ public class CompartilhamentoController {
 	private UsuarioRepository usuarioRepositorio;
 
 	@GetMapping("/")
-	public ResponseEntity<ResponseData> get(@RequestParam("idItem") long idItem) {
-		log.info("Entrando em get com idItem: {}", idItem);
+	public ResponseEntity<ResponseData> get(@RequestParam(name = "idItem", required = false) Long idItem,
+			@RequestParam(name = "idUsuario", required = false) Long idUsuario) {
+		if (idItem != null) {
+			return getByItem(idItem);
+		} else if (idUsuario != null) {
+			return getByUser(idUsuario);
+		} else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+
+	public ResponseEntity<ResponseData> getByItem(@RequestParam("idItem") long idItem) {
+		log.info("Entrando em getByItem com idItem: {}", idItem);
 		List<Compartilhamento> findByItemId = compartilhamentoRepository.findByItemId(idItem);
+		ArrayList<CompartilhamentoDTO> result = new ArrayList<CompartilhamentoDTO>();
+		findByItemId.forEach(compartilhamento -> {
+			CompartilhamentoDTO dto = new CompartilhamentoDTO(compartilhamento);
+			result.add(dto);
+		});
+		return ControllerResponse.success(result);
+	}
+
+	public ResponseEntity<ResponseData> getByUser(@RequestParam("idUsuario") long idUsuario) {
+		log.info("Entrando em getByUser com idItem: {}", idUsuario);
+		List<Compartilhamento> findByItemId = compartilhamentoRepository.findByUsuarioId(idUsuario);
 		ArrayList<CompartilhamentoDTO> result = new ArrayList<CompartilhamentoDTO>();
 		findByItemId.forEach(compartilhamento -> {
 			CompartilhamentoDTO dto = new CompartilhamentoDTO(compartilhamento);
@@ -59,13 +81,13 @@ public class CompartilhamentoController {
 	public ResponseEntity<ResponseData> cancelar(@PathVariable("idCompartilhamento") long idCompartilhamento) {
 		log.info("Entrando em cancelar com idCompartilhamento {}", idCompartilhamento);
 		Compartilhamento findById = compartilhamentoRepository.findById(idCompartilhamento).orElse(null);
-		if(findById == null) {
+		if (findById == null) {
 			return ResponseEntity.notFound().build();
 		}
 		findById.setCanceladoDono(true);
 		compartilhamentoRepository.save(findById);
 		return ControllerResponse.success(new CompartilhamentoDTO(findById));
-		
+
 	}
 
 	@PostMapping("")
