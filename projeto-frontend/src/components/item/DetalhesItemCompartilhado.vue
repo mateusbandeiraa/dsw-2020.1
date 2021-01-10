@@ -1,36 +1,41 @@
 <template lang="html">
   <div class="form-items-compartilhados row" v-if="this.$root.credentials">
     <div class="col-md-10 col-md-offset-1 text-left">
-      <h2 class="form-title">Detalhes de item compartilhado</h2>
-      <h3>{{item.nome}}</h3>
-      <h4>Descrição</h4>
-      <p>{{item.descricao}}</p>
-      <h4>Tipo</h4>
-      <p>{{item.tipo}}</p>
-    </div>
-          <table class="table table-striped" id="tbItens">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Descrição</th>
-          <th>Tipo</th>
-          <th class="commands"></th>
-        </tr>
-      </thead>
+      <div>
+        <h2 class="form-title">Detalhes de item compartilhado</h2>
+        <h3>{{item.nome}}</h3>
+        <h4>Descrição</h4>
+        <p>{{item.descricao}}</p>
+        <h4>Tipo</h4>
+        <p>{{item.tipo}}</p>
+      </div>
 
-      <tbody>
-        <!-- <tr v-for="item in items">
-          <td>{{item.nome}}</td>
-          <td>{{item.descricao}}</td>
-          <td>{{item.tipo}}</td>
-          <td class="commands">
-            <span class="glyphicon glyphicon-pencil" aria-hidden="true" @click="edita(item)"></span>
-            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" @click="detalhe(item)"></span>
-            <span class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
-          </td>
-        </tr> -->
-      </tbody>
+      <table class="table table-striped" id="tbItens">
+        <thead>
+          <tr>
+            <th>Data Início</th>
+            <th>Data Término</th>
+            <th>Usuário</th>
+            <th>Status</th>
+            <th class="commands"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-for="c in compartilhamentos">
+            <td>{{c.dataInicio}}</td>
+            <td>{{c.dataTermino}}</td>
+            <td>{{c.nomeUsuario}}</td>
+            <td>{{c.status}}</td>
+            <td class="commands">
+              <span class="glyphicon glyphicon-pencil" aria-hidden="true" @click="edita(item)"></span>
+              <span class="glyphicon glyphicon-eye-open" aria-hidden="true" @click="detalhe(item)"></span>
+              <span class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
+            </td>
+          </tr>
+        </tbody>
       </table>
+    </div>
   </div>
 </template>
 
@@ -43,8 +48,8 @@ export default {
   data() {
     return {
       error: {},
-
       success: false,
+      compartilhamentos: {},
 
       httpOptions: {
           baseURL: this.$root.config.url,
@@ -64,9 +69,9 @@ export default {
   methods: {
     getCompartilhamentos: function () {
       axios
-        .get(`/api/item/compartilhamento?idItem=${this.item.id}`, this.httpOptions)
+        .get(`/api/compartilhamento/?idItem=${this.item.id}`, this.httpOptions)
         .then(response => {
-          console.table(response.data);
+          this.compartilhamentos = response.data.data;
         })
     },
     processForm: function () {

@@ -31,85 +31,117 @@ Vue.use(Router)
 const router = new Router({
   mode: 'history',
   routes: [
-   {
-     path: '/',
-     name: 'home',
-     component: Homepage
-   },
-   {
-     path: '/login',
-     name: 'login',
-     component: Login,
-   },
-   {
-    path: '/login/new',
-    name: 'create-account',
-    component: CriacaoConta,
-  },
-  {
-   path: '/login/account-created',
-   name: 'account-created',
-   component: CriacaoContaSucesso,
-  },
-  {
-    path: '/login/forgot',
-    name: 'forgot-password',
-    component: EsquecimentoSenha,
-  },
-  {
-    path: '/login/token-sent',
-    name: 'token-sent',
-    component: EsquecimentoSenhaSucesso,
-  },  
-  {
-    path: '/login/reset',
-    name: 'reset-password',
-    component: RecuperacaoSenha,
-  },
-  {
-    path: '/login/reseted',
-    name: 'password-reseted',
-    component: RecuperacaoSenhaSucesso,
-  },  
-  {
-    path: '/login/change',
-    name: 'change-password',
-    component: TrocaSenha,
-  },
-  {
-    path: '/login/changed',
-    name: 'password-changed',
-    component: TrocaSenhaSucesso,
-  },
-  {
-    path: '/item/list',
-    name: 'item-list',
-    component: ListaItemCompartilhado,
-  },
-  {
-    path: '/item/update',
-    name: 'item-update',
-    component: AtualizaItemCompartilhado,
-    props: true
-  },
-  {
-    path: '/item/new',
-    name: 'item-new',
-    component: NovoItemCompartilhado,
-  },
-  {
-    path: '/item/delete',
-    name: 'item-delete',
-    component: RemoveItemCompartilhado,
-    props: true
-  },
-  {
-    path: '/item/details',
-    name: 'item-details',
-    component: DetalhesItemCompartilhado,
-    props: true
-  }
-]
+    {
+      path: '*',
+      redirect: '/'
+    },
+    {
+      path: '/',
+      name: 'home',
+      component: Homepage
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
+    },
+    {
+      path: '/login/new',
+      name: 'create-account',
+      component: CriacaoConta,
+    },
+    {
+      path: '/login/account-created',
+      name: 'account-created',
+      component: CriacaoContaSucesso,
+    },
+    {
+      path: '/login/forgot',
+      name: 'forgot-password',
+      component: EsquecimentoSenha,
+    },
+    {
+      path: '/login/token-sent',
+      name: 'token-sent',
+      component: EsquecimentoSenhaSucesso,
+    },  
+    {
+      path: '/login/reset',
+      name: 'reset-password',
+      component: RecuperacaoSenha,
+    },
+    {
+      path: '/login/reseted',
+      name: 'password-reseted',
+      component: RecuperacaoSenhaSucesso,
+    },  
+    {
+      path: '/login/change',
+      name: 'change-password',
+      component: TrocaSenha,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/login/changed',
+      name: 'password-changed',
+      component: TrocaSenhaSucesso,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/item/list',
+      name: 'item-list',
+      component: ListaItemCompartilhado,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/item/update',
+      name: 'item-update',
+      component: AtualizaItemCompartilhado,
+      props: true,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/item/new',
+      name: 'item-new',
+      component: NovoItemCompartilhado,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/item/delete',
+      name: 'item-delete',
+      component: RemoveItemCompartilhado,
+      props: true,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/item/details',
+      name: 'item-details',
+      component: DetalhesItemCompartilhado,
+      props: true,
+      meta: {
+        requiresAuth: true
+      }
+    }
+  ]
+})
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+
+  if (requiresAuth && !this.credentials) next('login')
+  else next();
 })
 
 new Vue({
