@@ -89,16 +89,20 @@ public class CompartilhamentoController {
 		if (findById == null) {
 			return ResponseEntity.notFound().build();
 		}
-		switch (status) {
+		switch (status.toUpperCase()) {
 		case "CANCELADO_DONO":
-			/* Verifica se o usuario logado é o dono do item */
-			if (!findById.getItem().getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
+		case "CANCELADO_USUARIO":
+			/*
+			 * Verifica se o usuario logado é o dono do item ou o destinatário do
+			 * compartilhamento
+			 */
+			if (!findById.getItem().getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())
+					|| !findById.getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 			break;
 		case "ACEITO":
 		case "REJEITADO":
-		case "CANCELADO_USUARIO":
 			/* Verifica se o usuario logado é o destinatário do compartilhamento */
 			if (!findById.getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -107,10 +111,19 @@ public class CompartilhamentoController {
 		default:
 			return ControllerResponse.fail("Status inválido.");
 		}
-		findById.setCanceladoDono(status.equals("CANCELADO_DONO"));
 		findById.setAceito(status.equals("ACEITO"));
 		findById.setRejeitado(status.equals("REJEITADO"));
-		findById.setCanceladoUsuario(status.equals("CANCELADO_USUARIO"));
+		
+		if(status.toUpperCase().startsWith("CANCELADO")) {
+			/* Verifica se o usuario logado é dono do item */
+			if(findById.getItem().getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
+				findById.setCanceladoDono(true);
+				findById.setCanceladoUsuario(false);
+			} else {
+				findById.setCanceladoDono(false);
+				findById.setCanceladoUsuario(true);
+			}
+		}
 		compartilhamentoRepository.save(findById);
 		return ControllerResponse.success(new CompartilhamentoDTO(findById));
 
