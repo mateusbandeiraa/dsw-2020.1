@@ -22,11 +22,11 @@
         </thead>
 
         <tbody>
-          <tr v-for="compartilhamento in compartilhamentos">
-            <td>{{compartilhamento.dataInicio}}</td>
-            <td>{{compartilhamento.dataTermino}}</td>
-            <td>{{compartilhamento.nomeUsuario}}</td>
-            <td>{{compartilhamento.status}}</td>
+          <tr v-for="c in compartilhamentos">
+            <td>{{readableDate(c.dataInicio)}}</td>
+            <td>{{readableDate(c.dataTermino)}}</td>
+            <td>{{c.nomeUsuario}}</td>
+            <td>{{c.status}}</td>
             <td class="commands">
               <span v-if="!compartilhamento.status.includes('CANCELADO')" class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(compartilhamento)"></span>
             </td>
@@ -96,6 +96,10 @@ export default {
         .then(response => {
           this.compartilhamentos = response.data.data;
         })
+    },
+
+    readableDate(date){
+      return new Intl.DateTimeFormat().format(new Date(date));
     }
   },
 };
