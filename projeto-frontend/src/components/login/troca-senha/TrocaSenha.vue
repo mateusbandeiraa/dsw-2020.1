@@ -7,19 +7,19 @@
       <form @submit.prevent="processForm">
         <div class="form-group">
           <label for="password">Nova senha</label>
-          <input type="password" class="form-control" id="password" placeholder="Entre com a senha atual" v-model="form.senhaAntiga"></input>
+          <input type="password" class="form-control" id="password" placeholder="Entre com a senha atual" v-model="form.senhaAntiga" autocomplete="on"></input>
           <span class="error" v-if="error.senhaAntiga">{{error.senhaAntiga}}</span>
         </div>
 
         <div class="form-group">
           <label for="password">Nova senha</label>
-          <input type="password" class="form-control" id="password" placeholder="Entre com uma senha" v-model="form.senhaNova"></input>
+          <input type="password" class="form-control" id="password" placeholder="Entre com uma senha" v-model="form.senhaNova" autocomplete="on"></input>
           <span class="error" v-if="error.senhaNova">{{error.senhaNova}}</span>
         </div>
 
         <div class="form-group">
           <label for="password-repeat">Repita a nova senha</label>
-          <input type="password" class="form-control" id="password-repeat" placeholder="Repita a sua senha" v-model="form.senhaNovaRepetida"></input>
+          <input type="password" class="form-control" id="password-repeat" placeholder="Repita a sua senha" v-model="form.senhaNovaRepetida" autocomplete="on"></input>
           <span class="error" v-if="error.senhaNovaRepetida">{{error.senhaNovaRepetida}}</span>
         </div>
 

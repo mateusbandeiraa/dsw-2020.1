@@ -137,14 +137,16 @@ const router = new Router({
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+let vueObj = {}
 
-  if (requiresAuth && !this.credentials) next('login')
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+
+  if (requiresAuth && !vueObj.credentials) next('login')
   else next();
 })
 
-new Vue({
+vueObj = new Vue({
   data: {
     credentials: null,
     config: {

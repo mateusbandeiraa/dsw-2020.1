@@ -19,13 +19,13 @@
 
         <div class="form-group">
           <label for="password">Senha</label>
-          <input type="password" class="form-control" id="password" placeholder="Entre com uma senha" v-model="form.senha"></input>
+          <input type="password" class="form-control" id="password" placeholder="Entre com uma senha" v-model="form.senha" autocomplete="on"></input>
           <span class="error" v-if="error.senha">{{error.senha}}</span>
         </div>
 
         <div class="form-group">
           <label for="password-repeat">Repita a senha</label>
-          <input type="password" class="form-control" id="password-repeat" placeholder="Repita a sua senha" v-model="form.senhaRepetida"></input>
+          <input type="password" class="form-control" id="password-repeat" placeholder="Repita a sua senha" v-model="form.senhaRepetida" autocomplete="on"></input>
           <span class="error" v-if="error.senhaRepetida">{{error.senhaRepetida}}</span>
         </div>
 

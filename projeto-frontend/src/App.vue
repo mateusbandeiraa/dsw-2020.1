@@ -2,7 +2,7 @@
   <div id="app">
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-header">
-        <span class="navbar-brand" href="#">Shared4U</span>
+        <router-link class="navbar-brand" :to="{name: 'home'}">Shared4U</router-link>
       </div>
 
       <div class="navbar-collapse collapse">
