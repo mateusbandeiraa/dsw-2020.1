@@ -23,8 +23,8 @@
 
         <tbody>
           <tr v-for="c in compartilhamentos">
-            <td>{{c.dataInicio}}</td>
-            <td>{{c.dataTermino}}</td>
+            <td>{{readableDate(c.dataInicio)}}</td>
+            <td>{{readableDate(c.dataTermino)}}</td>
             <td>{{c.nomeUsuario}}</td>
             <td>{{c.status}}</td>
             <td class="commands">
@@ -90,6 +90,10 @@ export default {
     goBackToList: function () {
       this.$router.replace("/item/list");
     },
+
+    readableDate(date){
+      return new Intl.DateTimeFormat().format(new Date(date));
+    }
   },
 };
 </script>
