@@ -23,8 +23,8 @@
 
         <tbody>
           <tr v-for="compartilhamento in compartilhamentos">
-            <td>{{readableDate(compartilhamento.dataInicio)}}</td>
-            <td>{{readableDate(compartilhamento.dataTermino)}}</td>
+            <td>{{compartilhamento.dataInicio | readableDate}}</td>
+            <td>{{compartilhamento.dataTermino | readableDate}}</td>
             <td>{{compartilhamento.nomeUsuario}}</td>
             <td>{{compartilhamento.status}}</td>
             <td class="commands">
@@ -90,18 +90,19 @@ export default {
     },
 
     remove: function(compartilhamento) {
-      this.$root.credentials;
       axios
         .post(`/api/compartilhamento/${compartilhamento.id}/status/`,{status:"CANCELADO"} , this.httpOptions)
         .then(response => {
           compartilhamento.status = response.data.data.status;
         })
     },
+  },
 
+  filters: {
     readableDate(date){
       return new Intl.DateTimeFormat().format(new Date(date));
     }
-  },
+  }
 };
 </script>
 
