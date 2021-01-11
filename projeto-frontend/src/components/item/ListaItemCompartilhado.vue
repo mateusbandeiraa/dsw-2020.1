@@ -6,6 +6,7 @@
           <h2 class="form-title">Itens Compartilhados</h2>
           <h6 class="form-subtitle">Abaixo estão os seus itens compartilhados.</h6>
         </div>
+        
         <div class="new-button">
           <button type="button" class="btn btn-primary" @click="novo">Novo Item</button>
         </div>
