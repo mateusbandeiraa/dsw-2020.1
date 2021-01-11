@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,21 +84,22 @@ public class CompartilhamentoController {
 
 	@PostMapping("{idCompartilhamento}/status")
 	public ResponseEntity<ResponseData> mudarStatus(@PathVariable("idCompartilhamento") long idCompartilhamento,
-			@RequestParam("status") String status) {
+			@RequestBody Map<String, String> params) {
+		String status = params.get("status");
+		System.out.println(status);
 		log.info("Entrando em cancelar com idCompartilhamento {}", idCompartilhamento);
 		Compartilhamento findById = compartilhamentoRepository.findById(idCompartilhamento).orElse(null);
 		if (findById == null) {
 			return ResponseEntity.notFound().build();
 		}
 		switch (status.toUpperCase()) {
-		case "CANCELADO_DONO":
-		case "CANCELADO_USUARIO":
+		case "CANCELADO":
 			/*
 			 * Verifica se o usuario logado é o dono do item ou o destinatário do
 			 * compartilhamento
 			 */
 			if (!findById.getItem().getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())
-					|| !findById.getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
+					&& !findById.getUsuario().getEmail().equals(obterUsuarioLogado().getEmail())) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 			break;

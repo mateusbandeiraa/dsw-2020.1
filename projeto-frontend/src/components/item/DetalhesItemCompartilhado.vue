@@ -92,9 +92,9 @@ export default {
     remove: function(compartilhamento) {
       this.$root.credentials;
       axios
-        .get(`/api/compartilhamento/${compartilhamento.id}/status/?status=CANCELADO`, this.httpOptions)
+        .post(`/api/compartilhamento/${compartilhamento.id}/status/`,{status:"CANCELADO"} , this.httpOptions)
         .then(response => {
-          this.compartilhamentos = response.data.data;
+          compartilhamento.status = response.data.data.status;
         })
     },
 
