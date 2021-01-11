@@ -22,11 +22,11 @@
         </thead>
 
         <tbody>
-          <tr v-for="c in compartilhamentos">
-            <td>{{readableDate(c.dataInicio)}}</td>
-            <td>{{readableDate(c.dataTermino)}}</td>
-            <td>{{c.nomeUsuario}}</td>
-            <td>{{c.status}}</td>
+          <tr v-for="compartilhamento in compartilhamentos">
+            <td>{{readableDate(compartilhamento.dataInicio)}}</td>
+            <td>{{readableDate(compartilhamento.dataTermino)}}</td>
+            <td>{{compartilhamento.nomeUsuario}}</td>
+            <td>{{compartilhamento.status}}</td>
             <td class="commands">
               <span v-if="!compartilhamento.status.includes('CANCELADO')" class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(compartilhamento)"></span>
             </td>
