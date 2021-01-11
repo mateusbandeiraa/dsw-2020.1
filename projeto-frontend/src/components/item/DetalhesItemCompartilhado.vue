@@ -22,15 +22,13 @@
         </thead>
 
         <tbody>
-          <tr v-for="c in compartilhamentos">
-            <td>{{c.dataInicio}}</td>
-            <td>{{c.dataTermino}}</td>
-            <td>{{c.nomeUsuario}}</td>
-            <td>{{c.status}}</td>
+          <tr v-for="compartilhamento in compartilhamentos">
+            <td>{{compartilhamento.dataInicio}}</td>
+            <td>{{compartilhamento.dataTermino}}</td>
+            <td>{{compartilhamento.nomeUsuario}}</td>
+            <td>{{compartilhamento.status}}</td>
             <td class="commands">
-              <span class="glyphicon glyphicon-pencil" aria-hidden="true" @click="edita(item)"></span>
-              <span class="glyphicon glyphicon-eye-open" aria-hidden="true" @click="detalhe(item)"></span>
-              <span class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
+              <span v-if="!compartilhamento.status.includes('CANCELADO')" class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(compartilhamento)"></span>
             </td>
           </tr>
         </tbody>
@@ -90,6 +88,15 @@ export default {
     goBackToList: function () {
       this.$router.replace("/item/list");
     },
+
+    remove: function(compartilhamento) {
+      this.$root.credentials;
+      axios
+        .get(`/api/compartilhamento/${compartilhamento.id}/status/?status=CANCELADO`, this.httpOptions)
+        .then(response => {
+          this.compartilhamentos = response.data.data;
+        })
+    }
   },
 };
 </script>
