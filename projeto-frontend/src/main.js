@@ -141,16 +141,40 @@ let vueObj = {}
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
-  if (requiresAuth && !vueObj.credentials) next('login')
-  else next();
+  console.log(vueObj);
+  if (requiresAuth && !localStorage.getItem('credentials')){
+    next('login');
+  } else{
+    next();
+  } 
 })
 
 vueObj = new Vue({
   data: {
-    credentials: null,
     config: {
       url: "http://localhost:8080"
+    }
+  },
+  computed: {
+    credentials: {
+      get: function(){
+        let value = localStorage.getItem('credentials');
+        if(value){
+         try{
+          return JSON.parse(value);
+         } catch (ex) {
+          localStorage.removeItem('credentials');
+         }
+        }
+        return null;
+      },
+      set: function(newValue){
+        if(newValue){
+          localStorage.setItem('credentials', JSON.stringify(newValue));
+        } else {
+          localStorage.removeItem('credentials');
+        }
+      }
     }
   },
 

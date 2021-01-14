@@ -42,7 +42,7 @@
     methods: {
       logout: function() {
         this.$root.credentials = null;
-        this.$router.replace('/');
+        this.$router.go('/');
       }
     }
   }
