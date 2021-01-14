@@ -174,7 +174,9 @@ export default {
 
   filters: {
     readableDate(date){
-      return new Intl.DateTimeFormat().format(new Date(date));
+      return new Date(date).toLocaleDateString('pt-BR', {
+        timeZone:"UTC"
+      });
     }
   }
 };
