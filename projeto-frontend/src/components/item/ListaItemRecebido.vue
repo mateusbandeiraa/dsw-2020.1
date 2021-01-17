@@ -27,24 +27,31 @@
 
         <tbody>
             <tr v-for="item in items">
-                <td>{{item.status}}</td>
+                <td>{{item.itemCompartilhado.nome}}</td>
                 <td>{{item.nomeDono}}</td>
-                <td>{{item.dataInicio}}</td>
-                <td>{{item.dataTermino}}</td>
+                <td>{{item.dataInicio | readableDate}}</td>
+                <td>{{item.dataTermino | readableDate}}</td>
                 <td>{{item.status}}</td>
                 <td class="commands">
-                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-ok" aria-hidden="true" @click="confirma(item)"></span>
-                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
+                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-ok" aria-hidden="true" title="Aceitar" @click="aceita(item)"></span>
+                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-remove" aria-hidden="true" title="Rejeitar" @click="rejeita(item)"></span>
                 </td>
             </tr>
         </tbody>
       </table>
 
-      <div v-if="check">
-        <span>Tem certeza que deseja cancelar este compartilhamento?</span>
-        <button class="btn btn-danger" @click="del(toRemove)">Sim</button>
+      <div v-if="checkRejeita">
+        <span>Tem certeza que deseja rejeitar este compartilhamento?</span>
+        <button class="btn btn-danger" @click="confirmaRejeita(toRemove)">Sim</button>
+      </div>
+
+      <div v-if="checkAceita">
+          <span>Tem certeza que deseja aceitar este compartilhamento?</span>
+          <button class="btn btn-success" @click="del(toRemove)">Sim</button>
+        </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -56,8 +63,10 @@ export default {
     return {
       items: [],
       filtro: '',
-      check: false,
-      toRemove: {},
+      checkRejeita: false,
+      checkAceita: false,
+      toRejeita: {},
+      toAceita: {},
       error: {},
 
       httpOptions: {
@@ -90,20 +99,29 @@ export default {
       this.$router.push({ name: 'item-new' });
     },
 
-    confirma: function(item) {
+    confirma: function(compartilhamento) {
+      this.checkAceita = false;
+
       axios
-        .post(`/api/compartilhamento/${item.id}/status/`, {status:"ACEITO"}, this.httpOptions)
+        .post(`/api/compartilhamento/${compartilhamento.id}/status/`, {status:"ACEITO"}, this.httpOptions)
         .then(response => {
-          item.status = response.data.data.status;
+          compartilhamento.status = response.data.data.status;
         })
         .catch((error) => {
-          this.error[item.id] = error.response.data.errors;
+          this.error[compartilhamento.id] = error.response.data.errors;
         });
     },
 
-    remove: function(compartilhamento) {
-      this.toRemove = compartilhamento
-      this.check = true;
+    aceita: function(compartilhamento) {
+      this.toAceita = compartilhamento
+      this.checkRejeita = false;
+      this.checkAceita = true;
+    },
+
+    rejeita: function(compartilhamento) {
+      this.toRejeita = compartilhamento
+      this.checkAceita = false;
+      this.checkRejeita = true;
     },
 
     detalhe: function (item) {
@@ -113,11 +131,11 @@ export default {
       });
     },
 
-    del: function(compartilhamento) {
-      this.check = false;
+    confirmaRejeita: function(compartilhamento) {
+      this.checkRejeita = false;
 
       axios
-        .post(`/api/compartilhamento/${compartilhamento.id}/status/`, {status:"CANCELADO"}, this.httpOptions)
+        .post(`/api/compartilhamento/${compartilhamento.id}/status/`, {status:"REJEITADO"}, this.httpOptions)
         .then(response => {
           compartilhamento.status = response.data.data.status;
         })
@@ -125,6 +143,14 @@ export default {
           this.error[compartilhamento.id] = error.response.data.errors;
         });
     },
+  },
+
+  filters: {
+    readableDate(date){
+      return new Date(date).toLocaleDateString('pt-BR', {
+        timeZone:"UTC"
+      });
+    }
   }
 }
 </script>
