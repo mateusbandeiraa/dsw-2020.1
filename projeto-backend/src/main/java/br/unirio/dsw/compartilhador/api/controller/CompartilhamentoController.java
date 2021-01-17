@@ -162,10 +162,8 @@ public class CompartilhamentoController {
 	}
 
 	private Usuario obterUsuarioLogado() {
-		if (usuarioLogado == null) {
-			usuarioLogado = usuarioRepositorio
-					.findByEmail((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-		}
+		usuarioLogado = usuarioRepositorio
+				.findByEmail((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 		return usuarioLogado;
 	}
 
