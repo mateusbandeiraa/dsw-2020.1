@@ -268,4 +268,15 @@ public class ItemCompartilhadoController
 	private String descricao;
 	
 	private String tipo;
+	
+	ItemCompartilhadoDTO(){
+		
+	}
+	
+	ItemCompartilhadoDTO(ItemCompartilhado itemCompartilhado){
+		this.setId(itemCompartilhado.getId());
+		this.setNome(itemCompartilhado.getNome());
+		this.setDescricao(itemCompartilhado.getDescricao());
+		this.setTipo(itemCompartilhado.getTipo().name());
+	}
 }

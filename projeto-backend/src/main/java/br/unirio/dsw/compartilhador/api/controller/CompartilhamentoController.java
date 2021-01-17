@@ -195,6 +195,7 @@ class CompartilhamentoDTO {
 	private String nomeUsuario;
 	private String nomeDono;
 	private String status;
+	private ItemCompartilhadoDTO itemCompartilhado;
 
 	CompartilhamentoDTO() {
 
@@ -212,5 +213,6 @@ class CompartilhamentoDTO {
 		this.setStatus(status);
 		this.setNomeUsuario(compartilhamento.getUsuario().getNome());
 		this.setNomeDono(compartilhamento.getItem().getUsuario().getNome());
+		this.setItemCompartilhado(new ItemCompartilhadoDTO(compartilhamento.getItem()));
 	}
 }
