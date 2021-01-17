@@ -29,12 +29,11 @@ import lombok.Setter;
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "*")
-public class AuthenticationController
-{
+public class AuthenticationController {
 	private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
 	private static final String TOKEN_HEADER = "Authorization";
-	
+
 	private static final String BEARER_PREFIX = "Bearer ";
 
 	@Autowired
@@ -50,40 +49,38 @@ public class AuthenticationController
 	 * Cria um novo token JWT após a validação de e-mail e senha
 	 */
 	@PostMapping
-	public ResponseEntity<ResponseData> gerarTokenJwt(@RequestBody LoginForm authenticationDto, BindingResult result) throws AuthenticationException
-	{
+	public ResponseEntity<ResponseData> gerarTokenJwt(@RequestBody LoginForm authenticationDto, BindingResult result)
+			throws AuthenticationException {
 		if (!ValidationUtils.validEmail(authenticationDto.getEmail()))
 			return ControllerResponse.fail("all", "Email inválido.");
 
 		if (!ValidationUtils.validPassword(authenticationDto.getSenha()))
 			return ControllerResponse.fail("all", "Credenciais inválidas.");
 
-		try
-		{
-			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(authenticationDto.getEmail(), authenticationDto.getSenha());
+		try {
+			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+					authenticationDto.getEmail(), authenticationDto.getSenha());
 			Authentication authentication = authenticationManager.authenticate(token);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			return ControllerResponse.fail("all", "Credenciais inválidas.");
 		}
 
 		Usuario usuario = usuarioRepositorio.findByEmail(authenticationDto.getEmail());
-		
+
 		if (usuario == null)
 			return ControllerResponse.fail("all", "Credenciais inválidas.");
-		
+
 		String sToken = jwtTokenUtil.obterToken(usuario.getEmail(), usuario.getAutorizacoes());
-		return ControllerResponse.success(new TokenForm(usuario.getNome(), sToken, usuario.isAdministrador()));
+		return ControllerResponse
+				.success(new TokenForm(usuario.getNome(), usuario.getId(), sToken, usuario.isAdministrador()));
 	}
 
 	/**
 	 * Gera um novo token com uma nova data de expiração
 	 */
 	@PostMapping(value = "/refresh")
-	public ResponseEntity<ResponseData> gerarRefreshTokenJwt(HttpServletRequest request)
-	{
+	public ResponseEntity<ResponseData> gerarRefreshTokenJwt(HttpServletRequest request) {
 		log.info("Gerando refresh token JWT.");
 		String token = request.getHeader(TOKEN_HEADER);
 
@@ -96,31 +93,32 @@ public class AuthenticationController
 		if (!jwtTokenUtil.tokenValido(token))
 			return ControllerResponse.fail("Token inválido ou expirado.");
 
-		String email = jwtTokenUtil.getUsernameFromToken(token); 
+		String email = jwtTokenUtil.getUsernameFromToken(token);
 		Usuario usuario = usuarioRepositorio.findByEmail(email);
-		
+
 		if (usuario == null)
 			return ControllerResponse.fail("O usuário associado ao token não foi encontrado no sistema.");
 
 		String refreshedToken = jwtTokenUtil.refreshToken(token);
-		return ControllerResponse.success(new TokenForm(usuario.getNome(), refreshedToken, usuario.isAdministrador()));
+		return ControllerResponse
+				.success(new TokenForm(usuario.getNome(), usuario.getId(), refreshedToken, usuario.isAdministrador()));
 	}
 }
 
 /**
  * Class that represents a token sent to the user
  */
-class TokenForm
-{
+class TokenForm {
 	private @Getter @Setter String nome;
+	private @Getter @Setter Long id;
 
 	private @Getter @Setter String token;
-	
+
 	private @Getter @Setter boolean administrador;
 
-	public TokenForm(String nome, String token, boolean administrador)
-	{
+	public TokenForm(String nome, Long id, String token, boolean administrador) {
 		this.nome = nome;
+		this.id = id;
 		this.token = token;
 		this.administrador = administrador;
 	}
