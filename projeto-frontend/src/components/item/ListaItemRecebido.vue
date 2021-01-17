@@ -33,8 +33,9 @@
                 <td>{{item.dataTermino | readableDate}}</td>
                 <td>{{item.status}}</td>
                 <td class="commands">
-                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-ok" aria-hidden="true" title="Aceitar" @click="aceita(item)"></span>
-                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-remove" aria-hidden="true" title="Rejeitar" @click="rejeita(item)"></span>
+                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-ok" aria-hidden="true" title="Aceitar" style="color: green" @click="aceita(item)"></span>
+                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-remove" aria-hidden="true" title="Rejeitar" style="color: red" @click="rejeita(item)"></span>
+                    <span v-if="item.status == 'ACEITO'" class="glyphicon glyphicon-remove" aria-hidden="true" title="Cancelar" style="color: red" @click="cancela(item)"></span>
                 </td>
             </tr>
         </tbody>
@@ -42,13 +43,17 @@
 
       <div v-if="checkRejeita">
         <span>Tem certeza que deseja rejeitar este compartilhamento?</span>
-        <button class="btn btn-danger" @click="confirmaRejeita(toRemove)">Sim</button>
+        <button class="btn btn-danger" @click="confirmaRejeita(toRejeita)">Sim</button>
       </div>
 
       <div v-if="checkAceita">
           <span>Tem certeza que deseja aceitar este compartilhamento?</span>
-          <button class="btn btn-success" @click="del(toRemove)">Sim</button>
-        </div>
+          <button class="btn btn-success" @click="confirmaAceita(toAceita)">Sim</button>
+      </div>
+
+      <div v-if="checkCancela">
+        <span>Tem certeza que deseja cancelar este compartilhamento?</span>
+        <button class="btn btn-danger" @click="confirmaCancela(toCancela)">Sim</button>
       </div>
     </div>
 
@@ -65,8 +70,10 @@ export default {
       filtro: '',
       checkRejeita: false,
       checkAceita: false,
+      checkCancela: false,
       toRejeita: {},
       toAceita: {},
+      toCancela: {},
       error: {},
 
       httpOptions: {
@@ -99,7 +106,35 @@ export default {
       this.$router.push({ name: 'item-new' });
     },
 
-    confirma: function(compartilhamento) {
+    detalhe: function (item) {
+      this.$router.push({
+        name: 'item-details',
+          params: { item: item }
+      });
+    },
+
+    aceita: function(compartilhamento) {
+      this.toAceita = compartilhamento;
+      this.checkRejeita = false;
+      this.checkCancela = false;
+      this.checkAceita = true;
+    },
+
+    rejeita: function(compartilhamento) {
+      this.toRejeita = compartilhamento;
+      this.checkAceita = false;
+      this.checkCancela = false;
+      this.checkRejeita = true;
+    },
+
+    cancela: function(compartilhamento) {
+      this.toCancela = compartilhamento;
+      this.checkAceita = false;
+      this.checkRejeita = false;
+      this.checkCancela = true;
+    },
+
+    confirmaAceita: function(compartilhamento) {
       this.checkAceita = false;
 
       axios
@@ -112,30 +147,24 @@ export default {
         });
     },
 
-    aceita: function(compartilhamento) {
-      this.toAceita = compartilhamento
-      this.checkRejeita = false;
-      this.checkAceita = true;
-    },
-
-    rejeita: function(compartilhamento) {
-      this.toRejeita = compartilhamento
-      this.checkAceita = false;
-      this.checkRejeita = true;
-    },
-
-    detalhe: function (item) {
-      this.$router.push({
-          name: 'item-details',
-          params: { item: item }
-      });
-    },
-
     confirmaRejeita: function(compartilhamento) {
       this.checkRejeita = false;
 
       axios
         .post(`/api/compartilhamento/${compartilhamento.id}/status/`, {status:"REJEITADO"}, this.httpOptions)
+        .then(response => {
+          compartilhamento.status = response.data.data.status;
+        })
+        .catch((error) => {
+          this.error[compartilhamento.id] = error.response.data.errors;
+        });
+    },
+
+    confirmaCancela: function(compartilhamento) {
+      this.checkCancela = false;
+
+      axios
+        .post(`/api/compartilhamento/${compartilhamento.id}/status/`, {status:"CANCELADO"}, this.httpOptions)
         .then(response => {
           compartilhamento.status = response.data.data.status;
         })

@@ -35,8 +35,8 @@
           <td>{{item.tipo}}</td>
           <td class="commands">
             <span class="glyphicon glyphicon-pencil" aria-hidden="true" title="Editar" @click="edita(item)"></span>
-            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Detalhes" @click="detalhe(item)"></span>
-            <span class="glyphicon glyphicon-remove" aria-hidden="true" title="Cancelar" @click="remove(item)"></span>
+            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Detalhes" style="color: blue" @click="detalhe(item)"></span>
+            <span class="glyphicon glyphicon-remove" aria-hidden="true" title="Cancelar" style="color: red" @click="remove(item)"></span>
           </td>
         </tr>
       </tbody>
