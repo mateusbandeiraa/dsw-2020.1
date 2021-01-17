@@ -12,6 +12,14 @@
                 <a class="btn btn-lg btn-success" href="#" role="button">Login</a>
               </router-link>
             </p>
+            <div v-else>
+              <p v-if="qtdItensAbertos > 0" style="color: red">
+                Você tem {{qtdItensAbertos}} itens recebidos abertos.
+              </p>
+              <p v-else style="color: blue">
+                Você não tem itens recebidos abertos.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -52,7 +60,33 @@
 </template>
 
 <script>
+  import axios from 'axios';
+
   export default {
+    data() {
+      return {
+        qtdItensAbertos: 0,
+
+        httpOptions: {
+          baseURL: this.$root.config.url,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + this.$root.credentials.token
+          }
+        },
+      }
+    },
+
+    created: function() {
+      axios.get(`/api/compartilhamento/?idUsuario=${this.$root.credentials.id}`,this.httpOptions)
+        .then(response => {
+          this.qtdItensAbertos = response.data.data.filter(item => item.status == "ABERTO").length;
+        })
+        .catch(error => {
+          this.error = error.response.data.errors;
+        });
+    }
   }
 </script>
 
