@@ -14,40 +14,35 @@
       </div>
 
       <table class="table table-striped" id="tbItens">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Descrição</th>
-          <th>Tipo</th>
-          <th class="commands"></th>
-        </tr>
-      </thead>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Dono</th>
+                <th>Data Início</th>
+                <th>Data Término</th>
+                <th>Status</th>
+                <th class="commands"></th>
+            </tr>
+        </thead>
 
-      <tbody>
-        <tr v-for="item in items">
-          <td>{{item.nome}}</td>
-          <td>{{item.descricao}}</td>
-          <td>{{item.tipo}}</td>
-          <td class="commands">
-            <span class="glyphicon glyphicon-pencil" aria-hidden="true" @click="edita(item)"></span>
-            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" @click="detalhe(item)"></span>
-            <span class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
-          </td>
-        </tr>
-      </tbody>
+        <tbody>
+            <tr v-for="item in items">
+                <td>{{item.status}}</td>
+                <td>{{item.nomeDono}}</td>
+                <td>{{item.dataInicio}}</td>
+                <td>{{item.dataTermino}}</td>
+                <td>{{item.status}}</td>
+                <td class="commands">
+                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-ok" aria-hidden="true" @click="confirma(item)"></span>
+                    <span v-if="item.status == 'ABERTO'" class="glyphicon glyphicon-remove" aria-hidden="true" @click="remove(item)"></span>
+                </td>
+            </tr>
+        </tbody>
       </table>
 
-      <div>
-        <div class="page-item first" :class="{ disable: this.page == 1 }" @click="moveTo(page-1)">&lt;&lt;</div>
-        <div class="page-item" v-if="page > 3" @click="moveTo(page-3)">{{page-3}}</div>
-        <div class="page-item" v-if="page > 2" @click="moveTo(page-2)">{{page-2}}</div>
-        <div class="page-item" v-if="page > 1" @click="moveTo(page-1)">{{page-1}}</div>
-        <div class="page-item current disable">{{page}}</div>
-        <div class="page-item" v-if="totalPages > page"   @click="moveTo(page+1)">{{page+1}}</div>
-        <div class="page-item" v-if="totalPages > page+1" @click="moveTo(page+2)">{{page+2}}</div>
-        <div class="page-item" v-if="totalPages > page+2" @click="moveTo(page+3)">{{page+3}}</div>
-        <div class="page-item last" :class="{ disable: this.page == this.totalPages }" @click="moveTo(page+1)">&gt;&gt;</div>
-        <div class="clear"></div>
+      <div v-if="check">
+        <span>Tem certeza que deseja cancelar este compartilhamento?</span>
+        <button class="btn btn-danger" @click="del(toRemove)">Sim</button>
       </div>
     </div>
   </div>
@@ -59,10 +54,11 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      page: 1,
-      totalPages: 1,
       items: [],
       filtro: '',
+      check: false,
+      toRemove: {},
+      error: {},
 
       httpOptions: {
           baseURL: this.$root.config.url,
@@ -81,38 +77,33 @@ export default {
 
   methods: {
     processForm: function() {
-      axios.get(`/api/compartilhamento/?idUsuario=${'2'}`,this.httpOptions)
+      axios.get(`/api/compartilhamento/?idUsuario=${this.$root.credentials.id}`,this.httpOptions)
         .then(response => {
-          this.items = response.data.data.data;
-          this.page = response.data.data.current_page;
-          this.totalPages = response.data.data.last_page;
-          this.error = {};
+          this.items = response.data.data;
         })
         .catch(error => {
           this.error = error.response.data.errors;
         });
     },
 
-    moveTo: function(page) {
-      if (page < 1) 
-        page = 1;
-
-      if (page > this.totalPages) 
-        page = this.totalPages;
-
-      this.page = page;
-      this.processForm();
-    },
-
     novo: function() {
       this.$router.push({ name: 'item-new' });
     },
 
-    edita: function(item) {
-      this.$router.push({
-          name: 'item-update',
-          params: { item: item }
-      });
+    confirma: function(item) {
+      axios
+        .post(`/api/compartilhamento/${item.id}/status/`, {status:"ACEITO"}, this.httpOptions)
+        .then(response => {
+          item.status = response.data.data.status;
+        })
+        .catch((error) => {
+          this.error[item.id] = error.response.data.errors;
+        });
+    },
+
+    remove: function(compartilhamento) {
+      this.toRemove = compartilhamento
+      this.check = true;
     },
 
     detalhe: function (item) {
@@ -122,11 +113,17 @@ export default {
       });
     },
 
-    remove: function(item) {
-      this.$router.push({
-          name: 'item-delete',
-          params: { item: item }
-      });
+    del: function(compartilhamento) {
+      this.check = false;
+
+      axios
+        .post(`/api/compartilhamento/${compartilhamento.id}/status/`, {status:"CANCELADO"}, this.httpOptions)
+        .then(response => {
+          compartilhamento.status = response.data.data.status;
+        })
+        .catch((error) => {
+          this.error[compartilhamento.id] = error.response.data.errors;
+        });
     },
   }
 }
