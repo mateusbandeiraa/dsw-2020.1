@@ -25,6 +25,7 @@ import NovoItemCompartilhado from './components/item/NovoItemCompartilhado.vue'
 import AtualizaItemCompartilhado from './components/item/AtualizaItemCompartilhado.vue'
 import RemoveItemCompartilhado from './components/item/RemoveItemCompartilhado.vue'
 import DetalhesItemCompartilhado from './components/item/DetalhesItemCompartilhado.vue'
+import ListaItemRecebido from './components/item/ListaItemRecebido.vue'
 
 Vue.use(Router)
 
@@ -133,6 +134,14 @@ const router = new Router({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/item/recebido',
+      name: 'item-recebido',
+      component: ListaItemRecebido,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
@@ -141,12 +150,15 @@ let vueObj = {}
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  console.log(vueObj);
-  if (requiresAuth && !localStorage.getItem('credentials')){
+  let name = '';
+  to.matched.some(record => name = record.name);
+  if (requiresAuth && !localStorage.getItem('credentials')) {
     next('login');
-  } else{
+  } else if (localStorage.getItem('credentials') && ['login', 'create-account', 'account-created', 'forgot-password', 'reset-password', 'password-reseted'].includes(name)) {
+    next('home');
+  } else {
     next();
-  } 
+  }
 })
 
 vueObj = new Vue({
@@ -157,19 +169,21 @@ vueObj = new Vue({
   },
   computed: {
     credentials: {
-      get: function(){
+      get: function() {
         let value = localStorage.getItem('credentials');
-        if(value){
-         try{
-          return JSON.parse(value);
-         } catch (ex) {
-          localStorage.removeItem('credentials');
-         }
+
+        if (value) {
+          try {
+            return JSON.parse(value);
+          } catch (ex) {
+            localStorage.removeItem('credentials');
+          }
         }
+
         return null;
       },
-      set: function(newValue){
-        if(newValue){
+      set: function(newValue) {
+        if (newValue) {
           localStorage.setItem('credentials', JSON.stringify(newValue));
         } else {
           localStorage.removeItem('credentials');

@@ -67,7 +67,7 @@
 
       <div v-if="check">
         <span>Tem certeza que deseja cancelar este compartilhamento?</span>
-        <button class="btn btn-primary" @click="remove(toRemove)">Sim</button>
+        <button class="btn btn-danger" @click="remove(toRemove)">Sim</button>
       </div>
       <span class="error" v-if="error[toRemove.id]">{{error[toRemove.id]}}</span>
     </div>

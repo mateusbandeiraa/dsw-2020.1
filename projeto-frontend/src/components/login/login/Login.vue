@@ -50,7 +50,7 @@
         axios.post(this.$root.config.url + "/auth", this.form)
           .then(response => {
             this.$root.credentials = response.data.data;
-            this.$router.go('/');
+            this.$router.go('home');
             this.error = {};
           })
           .catch(error => {

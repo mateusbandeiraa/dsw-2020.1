@@ -8,7 +8,13 @@
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-left">
             <li v-if="$root.credentials">
-              <router-link class="link" :to="{ name: 'item-list' }">Itens</router-link>
+              <router-link class="link" :to="{ name: 'item-list' }">Itens Compartilhados</router-link>
+            </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-left">
+            <li v-if="$root.credentials">
+              <router-link class="link" :to="{ name: 'item-recebido' }">Itens Recebidos</router-link>
             </li>
         </ul>
 
@@ -42,7 +48,7 @@
     methods: {
       logout: function() {
         this.$root.credentials = null;
-        this.$router.go('/');
+        this.$router.go('home');
       }
     }
   }
